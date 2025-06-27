@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStream - Aulas Salvas</title>
+    <link rel="stylesheet" href="/stylesheets/salvas.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+        <div class="container">
+        <header class="main-header">
+            <div class="logo-container">
+                <img src="/images/Fictional_company_logo.jpg" alt="EduStream Logo" class="logo-image">
+                <span class="logo-text">EduStream</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" placeholder="Procurar cursos" class="search-input">
+                <button class="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </div>
+            
+            <div class="user-profile">
+                <button class="profile-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+            </div>
+        </header>
+        
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/menu">Home</a></li>
+                <li class="nav-item active"><a href="/aulas_salvas">Aulas Salvas</a></li>
+                <li class="nav-item"><a href="/meus_cursos">Meus Cursos</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1 class="page-title">Aulas Salvas</h1>
+
+            <% if (aulas.length === 0) { %>
+            <div style="text-align: center; margin-top: 50px; font-size: 1.5em; color: #555;">
+                Não há aulas salvas no momento.
+            </div>
+            <% } else { %>
+            <div class="lessons-grid">
+                <% aulas.forEach(aula => { %>
+                    <a href="/aula/<%= aula.aulaid %>" class="lesson-link" style="text-decoration: none;">
+
+                        <div class="lesson-card">
+                            <div class="lesson-thumbnail">
+                                <div class="play-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="lesson-info">
+                                <h3><%= aula.titulo || 'AULA #' + String(aula.aulaid).padStart(3, '0') %></h3>
+                                <button class="btn-continue">
+                                    <% if (aula.status === 'concluido') { %>
+                                        Reassistir
+                                    <% } else if (aula.status === 'em andamento') { %>
+                                        Continuar
+                                    <% } else { %>
+                                        Iniciar
+                                    <% } %>
+                                </button>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+            <% } %>
+        </main>
+    </div>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const lessonCards = document.querySelectorAll('.lesson-card');
+    
+    lessonCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Pega o número da aula do h3
+            const lessonNumber = this.querySelector('h3').textContent.replace('AULA #', '');
+            
+            // Redireciona para a página da aula
+            window.location.href = `/aula/${lessonNumber}`;
+        });
+    });
+});
+</script>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStream - Plataforma de Cursos Online</title>
+    <link rel="stylesheet" href="/stylesheets/menu.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <div class="logo-container">
+                <img src="/images/Fictional_company_logo.jpg" alt="EduStream Logo" class="logo-image">
+                <span class="logo-text">EduStream</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" placeholder="Procurar cursos" class="search-input">
+                <button class="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </div>
+            
+            <div class="user-profile">
+                <button class="profile-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+            </div>
+        </header>
+        
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li class="nav-item active"><a href="#">Home</a></li>
+                <li class="nav-item"><a href="/aulas_salvas/<%= usuarioCodigo %>">Aulas Salvas</a></li>
+                <li class="nav-item"><a href="/meus_cursos">Meus Cursos</a></li>
+            </ul>
+        </nav>
+        
+        <section class="categories-section">
+            <h2>Categorias:</h2>
+            <div class="categories-list">
+                <button class="category-btn active">Todos</button>
+                <% categorias.forEach(cat => { %>
+                    <button class="category-btn"><%= cat.catnome %></button>
+                <% }) %>
+            </div>
+        </section>
+        
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <div class="search-filter">
+                    <div class="filter-search-container">
+                        <input type="text" placeholder="Busca" class="filter-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Duração</h3>
+                    <p class="duration-label">De 1 a 18 meses</p>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="18" value="18" class="slider" id="duration-slider">
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Filtrar por:</h3>
+                    <div class="checkbox-list">
+                        <% filtros.forEach(filtro => { %>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="filtros" value="<%= filtro.filtcodigo %>">
+                            <span class="checkbox-label"><%= filtro.filtnome %></span>
+                        </label>
+                        <% }) %>
+                    </div>
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <h1 class="content-title">Cursos</h1>
+                
+                <div class="courses-grid">
+                <% cursos.forEach(curso => { %>
+                    <div class="course-card">
+                    <div class="course-info">
+                        <span class="course-hours"><%= curso.curhoras %> horas</span>
+                        <h3 class="course-title"><%= curso.curnome %></h3>
+                        <a href="/curso/<%= curso.curcodigo %>" class="course-link">Mais Sobre o curso</a>
+                    </div>
+                    <div class="course-image">
+                        <img src="/images/check_5610944.svg" alt="<%= curso.curnome %>">
+                    </div>
+                    </div>
+                <% }); %>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const buttons = document.querySelectorAll('.category-btn');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove 'active' de todos os botões
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Adiciona 'active' apenas ao botão clicado
+            button.classList.add('active');
+        });
+    });
+    
+const slider = document.getElementById('duration-slider');
+
+function updateSliderBackground(slider) {
+    const min = slider.min;
+    const max = slider.max;
+    const val = slider.value;
+
+    const percent = ((val - min) / (max - min)) * 100;
+
+    slider.style.background = `linear-gradient(to right, #7F56D9 0%, #7F56D9 ${percent}%, #fff ${percent}%, #fff 100%)`;
+}
+
+updateSliderBackground(slider);
+
+slider.addEventListener('input', () => {
+    updateSliderBackground(slider);
+});
+
+</script>

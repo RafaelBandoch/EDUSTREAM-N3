@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>EduStream | Cadastro</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="login-form">
+                <div class="logo">
+                    <img src="/images/Fictional_company_logo.jpg">
+                    <span>EduStream</span>
+                </div>
+                <h1>Cadastro</h1>
+                <p class="subtitle">Bem-vindo, cadastre-se para continuar.</p>
+
+                <form action="/cadastro" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input id="nome" name="nome" required type="text" placeholder="Digite seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input id="email" name="email" required type="email" placeholder="Digite seu e-mail">
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input id="senha" name="senha" required type="password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label for="foto">Foto de perfil</label>
+                        <input id="foto" name="foto" required type="file" accept="image/jpeg,image/png"
+                            style="padding: 8px 0;">
+                    </div>
+
+                    <button type="submit" class="login-btn">Cadastrar</button>
+
+                    <div class="divider">
+                        <span>ou</span>
+                    </div>
+                    <button type="button" class="google-btn">
+                        <img src="/images/google.png">
+                        Cadastrar com Google
+                    </button>
+                </form>
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="/" class="cadastro">Já tem conta? Faça login</a>
+                </div>
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="/images/image (1).svg" style="width: 100%; height: 100%;">
+        </div>
+    </div>
+</body>
+
+</html>

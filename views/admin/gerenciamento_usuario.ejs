@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de usuário - EduStream</title>
+  <link rel="stylesheet" href="/stylesheets/gerenciamento_usuarios.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>EduStream</span>
+            </div>
+           
+            <nav class="nav-menu">
+                <a href="/admin/dashboard" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/gerenciamento_usuario" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Gerenciamento de usuário</span>
+                </a>
+                <a href="/admin/gerenciamento_curso" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Gerenciamento de cursos</span>
+                </a>
+            </nav>
+           
+            <div class="sidebar-footer">
+                <a href="/admin/sair" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+ 
+       
+ 
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1>Gerenciamento de usuário</h1>
+        <div class="user-profile">
+          <img src="/images/avatar.png" alt="Avatar" class="avatar">
+        </div>
+      </div>
+     
+      <p class="welcome-message">Bem vindo de volta, <%= user.name %></p>
+     
+      <div class="users-section">
+        <div class="users-header">
+          <h2>Todos os usuários <span class="user-count"><%= totalUsers %></span></h2>
+          <div class="users-actions">
+            <div class="search-container">
+              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="Procurar" class="search-input">
+            </div>
+            <button class="filter-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filtrar
+            </button>
+          </div>
+        </div>
+       
+        <div class="users-table">
+          <div class="table-header">
+            <div class="checkbox-cell">
+              <input type="checkbox" id="select-all">
+            </div>
+            <div class="name-cell">Nome</div>
+            <div class="access-cell">Acesso</div>
+            <div class="last-seen-cell">Visto por último</div>
+            <div class="date-added-cell">Data adição</div>
+          </div>
+         
+          <div class="table-body">
+            <% users.forEach(function(user) { %>
+              <div class="table-row">
+                <div class="checkbox-cell">
+                  <input type="checkbox" class="user-checkbox">
+                </div>
+                <div class="name-cell">
+                  <div class="user-info">
+                    <img src="/images/avatar.png" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                      <div class="user-name"><%= user.name %></div>
+                      <div class="user-email"><%= user.email %></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="access-cell">
+                  <div class="access-tags">
+                    <% user.access.forEach(function(access) { %>
+                      <span class="access-tag <%= access === 'admin' ? 'admin-tag' : '' %>"><%= access %></span>
+                    <% }); %>
+                  </div>
+                </div>
+                <div class="last-seen-cell"><%= user.lastSeen %></div>
+                <div class="date-added-cell"><%= user.dateAdded %></div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <script>
+    document.getElementById('select-all').addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('.user-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
+  </script>
+ 
+  <script>
+  const navItems = document.querySelectorAll('.nav-item');
+  const currentPath = window.location.pathname;
+ 
+  navItems.forEach(item => {
+    const href = item.getAttribute('href');
+    if (currentPath.startsWith(href)) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+</script>
+</body>
+</html>
