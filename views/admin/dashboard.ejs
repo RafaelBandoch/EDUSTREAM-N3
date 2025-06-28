@@ -1,187 +1,224 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title><%= title || 'Dashboard - EduStream' %></title>
-    <link rel="stylesheet" href="/stylesheets/dashboard.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+            <span>EduStream</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="/admin/dashboard" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/gerenciamento_usuario" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Gerenciamento de usuário</span>
+            </a>
+            <a href="/admin/gerenciamento_curso" class="nav-item">
                 <i class="fas fa-graduation-cap"></i>
-                <span>EduStream</span>
+                <span>Gerenciamento de cursos</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/admin/sair" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Dashboard</h1>
+            <p class="welcome-text">Bem vindo de volta, <%= user || 'Fulano' %></p>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-content">
+                    <h3>Total de cursos</h3>
+                    <div class="metric-value"><%= totalCursos %></div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span><%= comparativo.cursos %>% em comparação com mês passado</span>
+                    </div>
+                </div>
             </div>
-           
-            <nav class="nav-menu">
-                <a href="/admin/dashboard" class="nav-item active">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="/admin/gerenciamento_usuario" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Gerenciamento de usuário</span>
-                </a>
-                <a href="/admin/gerenciamento_curso" class="nav-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Gerenciamento de cursos</span>
-                </a>
-            </nav>
-           
-            <div class="sidebar-footer">
-                <a href="/admin/sair" class="nav-item">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
-                </a>
+
+            <div class="metric-card">
+                <div class="metric-content">
+                    <h3>Total de alunos</h3>
+                    <div class="metric-value"><%= totalAlunos %></div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span><%= comparativo.alunos %>% em comparação com mês passado</span>
+                    </div>
+                </div>
             </div>
-        </aside>
- 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="dashboard-header">
-                <h1>Dashboard</h1>
-                <p class="welcome-text">Bem vindo de volta, <%= user || 'Fulano' %></p>
-            </header>
- 
-            <% if (typeof erro !== 'undefined') { %>
-                <div class="alert alert-danger">
-                    <%= erro %>
-                </div>
-            <% } %>
- 
-            <!-- Metrics Cards -->
-            <section class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-content">
-                        <h3>Total de cursos</h3>
-                        <div class="metric-value"><%= totalCursos %></div>
-                        <div class="metric-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span><%= comparativo.cursos %>% em comparação com mês passado</span>
-                        </div>
-                    </div>
-                    <div class="metric-chart">
-                        <canvas id="coursesChart" width="60" height="40"></canvas>
+
+            <div class="metric-card">
+                <div class="metric-content">
+                    <h3>Receita total</h3>
+                    <div class="metric-value"><%= receitaTotal %></div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span><%= comparativo.receita %>% em comparação com mês passado</span>
                     </div>
                 </div>
- 
-                <div class="metric-card">
-                    <div class="metric-content">
-                        <h3>Total de alunos</h3>
-                        <div class="metric-value"><%= totalAlunos.toLocaleString('pt-BR') %></div>
-                        <div class="metric-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span><%= comparativo.alunos %>% em comparação com mês passado</span>
-                        </div>
-                    </div>
-                    <div class="metric-chart">
-                        <canvas id="studentsChart" width="60" height="40"></canvas>
-                    </div>
+            </div>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Alunos por curso</h3>
                 </div>
- 
-                <div class="metric-card">
-                    <div class="metric-content">
-                        <h3>Receita mensal</h3>
-                        <div class="metric-value">R$ <%= receitaMensal.toLocaleString('pt-BR') %></div>
-                        <div class="metric-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span><%= comparativo.receita %>% em comparação com mês passado</span>
-                        </div>
-                    </div>
-                    <div class="metric-chart">
-                        <canvas id="revenueChart" width="60" height="40"></canvas>
-                    </div>
+                <canvas id="studentsPerCourseChart"></canvas>
+            </div>
+
+            <div class="feedback-section">
+  <div class="feedback-card positive">
+    <h4>O que os clientes amam</h4>
+    <% feedbacks.forEach(f => { if (f.tipo === 'positive') { %>
+      <div class="feedback-item">
+        <div class="feedback-bar positive"></div>
+        <span><%= f.mensagem %></span>
+      </div>
+    <% } }) %>
+  </div>
+
+  <div class="feedback-card negative">
+    <h4>O que os clientes odeiam</h4>
+    <% feedbacks.forEach(f => { if (f.tipo === 'negative') { %>
+      <div class="feedback-item">
+        <div class="feedback-bar negative"></div>
+        <span><%= f.mensagem %></span>
+      </div>
+    <% } }) %>
+  </div>
+</div>
+
+        </section>
+
+        <section class="bar-chart-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Cursos mais vendidos</h3>
                 </div>
-            </section>
- 
-            <!-- Charts Section -->
-            <section class="charts-section">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Alunos por curso</h3>
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #8B5CF6;"></span>
-                                <span>Curso 1</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #A78BFA;"></span>
-                                <span>Curso 2</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #C4B5FD;"></span>
-                                <span>Curso 3</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #DDD6FE;"></span>
-                                <span>Curso 4</span>
-                            </div>
-                        </div>
-                    </div>
-                    <canvas id="studentsPerCourseChart"></canvas>
-                </div>
- 
-                <div class="feedback-section">
-                    <div class="feedback-card positive">
-                        <h4>O que os clientes amam</h4>
-                        <div class="feedback-item">
-                            <div class="feedback-bar positive"></div>
-                            <span>Explicações claras e objetivas</span>
-                        </div>
-                        <div class="feedback-item">
-                            <div class="feedback-bar positive"></div>
-                            <span>Conteúdo bem explicado e fácil de entender</span>
-                        </div>
-                    </div>
- 
-                    <div class="feedback-card negative">
-                        <h4>O que os clientes odeiam</h4>
-                        <div class="feedback-item">
-                            <div class="feedback-bar negative"></div>
-                            <span>O conteúdo é interessante, mas poderia ser mais aprofundado e atualizado</span>
-                        </div>
-                        <div class="feedback-item">
-                            <div class="feedback-bar negative"></div>
-                            <span>Falta organização e exemplos práticos</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
- 
-            <!-- Bar Chart -->
-            <section class="bar-chart-section">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Cursos mais vendidos</h3>
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #8B5CF6;"></span>
-                                <span>Curso 1</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #A78BFA;"></span>
-                                <span>Curso 2</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #C4B5FD;"></span>
-                                <span>Curso 3</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #DDD6FE;"></span>
-                                <span>Curso 4</span>
-                            </div>
-                        </div>
-                    </div>
-                    <canvas id="topCoursesChart"></canvas>
-                </div>
-            </section>
-        </main>
-    </div>
- 
-    <script src="/javascripts/dashboard.js"></script>
+                <canvas id="topCoursesChart" width="300px" height="300px"></canvas>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('labelsAlunos:', <%- labelsAlunos %>);
+    console.log('dataAlunos:', <%- dataAlunos %>);
+
+    const colors = <%- labelsAlunos %>.map((_, i) => {
+        const palette = [
+            '#8B5CF6', '#A78BFA', '#7C3AED', '#6366F1',
+            '#3B82F6', '#0EA5E9', '#14B8A6', '#22C55E', '#F59E0B'
+        ];
+        return palette[i % palette.length];
+    });
+
+    const ctxAlunos = document.getElementById('studentsPerCourseChart');
+    if (ctxAlunos) {
+        new Chart(ctxAlunos.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: <%- labelsAlunos %>,
+                datasets: [{
+                    label: 'Alunos inscritos',
+                    data: <%- dataAlunos %>,
+                    backgroundColor: colors,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 5,
+                            color: '#64748b'
+                        },
+                        grid: { color: '#f1f5f9' }
+                    },
+            x: {
+                ticks: { display: false }, // não exibe as labels
+                grid: { display: false }
+            }
+
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rect',
+                            padding: 20,
+                            generateLabels(chart) {
+                                return chart.data.labels.map((label, i) => ({
+                                    text: label,
+                                    fillStyle: colors[i],
+                                    strokeStyle: colors[i],
+                                    lineWidth: 0,
+                                    hidden: false,
+                                    index: i
+                                }));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const ctxReceita = document.getElementById('topCoursesChart');
+    if (ctxReceita) {
+        new Chart(ctxReceita.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: <%- labelsReceita %>,
+                datasets: [{
+                    data: <%- dataReceita %>,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

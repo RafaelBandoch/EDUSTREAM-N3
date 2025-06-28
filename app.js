@@ -45,6 +45,8 @@ const upload = multer({
  }
  }
 });
+app.use('/uploads', express.static('public/uploads'));
+
 
 
 app.use('/', indexRouter);

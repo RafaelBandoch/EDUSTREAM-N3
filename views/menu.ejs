@@ -83,14 +83,14 @@
                 <div class="courses-grid">
                 <% cursos.forEach(curso => { %>
                     <div class="course-card">
-                    <div class="course-info">
-                        <span class="course-hours"><%= curso.curhoras %> horas</span>
-                        <h3 class="course-title"><%= curso.curnome %></h3>
-                        <a href="/curso/<%= curso.curcodigo %>" class="course-link">Mais Sobre o curso</a>
-                    </div>
-                    <div class="course-image">
-                        <img src="/images/check_5610944.svg" alt="<%= curso.curnome %>">
-                    </div>
+                        <div class="course-info">
+                            <span class="course-hours"><%= curso.curhoras %> horas</span>
+                            <h3 class="course-title"><%= curso.curnome %></h3>
+                            <a href="/curso/<%= curso.curcodigo %>" class="course-link">Mais Sobre o curso</a>
+                        </div>
+                        <div class="course-image">
+                           <img src="/uploads/<%= curso.curthumb %>" alt="<%= curso.curnome %>">
+                        </div>
                     </div>
                 <% }); %>
                 </div>

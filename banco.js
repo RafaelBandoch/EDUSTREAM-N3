@@ -64,27 +64,39 @@ async function end() {
 
 
 async function listarCursos() {
-  const conn = await conectarBD()
- 
-  try {
-    const [results] = await conn.query("SELECT * FROM cursos ORDER BY created_at DESC")
- 
-    // Formatar dados para o template
-    const cursosFormatados = results.map((curso) => ({
-      titulo: curso.curnome,
-      status: "ATIVO", // Você pode adicionar um campo status na tabela
-      statusClass: "active",
-      alunos: Math.floor(Math.random() * 500) + 50, // Simular número de alunos
-      preco: `R$ ${curso.curpreco.toFixed(2).replace(".", ",")}`,
-    }))
- 
-    return cursosFormatados
-  } catch (error) {
-    console.error("Erro ao listar cursos:", error)
-    return []
-  }
+  const conn = await conectarBD();
+  const [results] = await conn.query(`
+    SELECT 
+      c.curnome AS titulo,
+      c.curpreco AS preco,
+      COUNT(uc.usucodigo) AS alunos
+    FROM cursos c
+    LEFT JOIN usuario_curso uc ON c.curcodigo = uc.curcodigo
+    GROUP BY c.curcodigo
+    ORDER BY c.curcodigo asc;
+  `);
+
+  // Formatar o status (fixo por enquanto)
+  return results.map(curso => ({
+    titulo: curso.titulo,
+    alunos: curso.alunos,
+    preco: curso.preco
+  }));
 }
- 
+
+async function listarReceitaMensal() {
+  const conn = await conectarBD();
+  const [results] = await conn.query(`
+    SELECT 
+      c.curnome AS curso,
+      r.total
+    FROM receita_curso r
+    JOIN cursos c ON c.curcodigo = r.curcodigo
+    ORDER BY r.total ASC
+  `);
+  return results;
+}
+
 async function listarUsuarios() {
   const conn = await conectarBD();
 
@@ -97,8 +109,9 @@ async function listarUsuarios() {
 
     const usuariosFormatados = results.map((usuario) => ({
       id: usuario.usucodigo,
-      name: usuario.usuname || "Usuário sem nome",
+      name: usuario.usunome || "Usuario Sem Nome",
       email: usuario.usuemail || "email@exemplo.com",
+      foto: usuario.usufoto || "/uploads/default.jpg",
       access: ["exportação de dados"], // valor padrão já que não existe campo tipo
       lastSeen: "23 Mar, 2025",        // valor fixo de exemplo
       dateAdded: "30 Jan, 2022"        // valor fixo de exemplo
@@ -134,7 +147,7 @@ async function buscaAulaCursoId(id) {
 async function buscaCursoUsuario(usuario) {
   const conexao = await conectarBD();
   const sql = `SELECT 
-  c.curcodigo, c.curnome, c.curdescricao, cat.catnome AS categoria, c.curhoras, c.curpreco
+  c.curcodigo, c.curnome, c.curdescricao, c.curthumb, cat.catnome AS categoria, c.curhoras, c.curpreco
 FROM cursos c
 JOIN usuario_curso uc ON c.curcodigo = uc.curcodigo
 JOIN categorias cat ON c.catcodigo = cat.catcodigo
@@ -157,9 +170,28 @@ const [curso] = await conexao.query(sql, id);
 return curso[0];
 }
 
+
+async function listarAlunosPorCurso() {
+  const conn = await conectarBD();
+
+  // Você pode adaptar para pegar por mês se tiver coluna de data, 
+  // mas como sua tabela é só usuario_curso, vamos só contar alunos por curso
+  const [results] = await conn.query(`
+    SELECT 
+      c.curnome AS curso,
+      COUNT(uc.usucodigo) AS alunos
+    FROM cursos c
+    LEFT JOIN usuario_curso uc ON uc.curcodigo = c.curcodigo
+    GROUP BY c.curcodigo
+    ORDER BY c.curcodigo;
+  `);
+
+  return results;
+}
+
 // Conecta ao iniciar
 conectarBD();
 
 module.exports = { buscaCursoId, buscaAulaId, buscaCursoAulaId, buscaAulaCursoId, buscaCursoUsuario, conectarBD, 
   buscarUsuario, buscarAdmin, CadastroUsuario, adminInserirCurso, adminEditarCurso, listarCursos, listarUsuarios, 
-  query, end,  };
+  query, end, listarReceitaMensal, listarAlunosPorCurso };

@@ -31,7 +31,62 @@ router.post('/login', async (req, res) => {
     return res.render('admin/loginadm', { erro: 'Erro interno no servidor' });
   }
 });
+/*
 // GET /admin/dashboard
+router.get('/dashboard', verLogin, async (req, res) => {
+  try {
+     const conn = await global.banco.conectarBD();
+    // Total de cursos
+    const [cursos] = await conn.query("SELECT COUNT(*) AS total FROM cursos");
+    const totalCursos = cursos[0].total;
+    // Total de usuários
+    const [alunos] = await conn.query("SELECT COUNT(*) AS total FROM usuarios");
+    const totalAlunos = alunos[0].total;
+    // Receita total
+    const [receita] = await conn.query("SELECT SUM(total) as total FROM receita_curso");
+    const receitaTotal = receita[0].total;
+    // Alunos por curso
+    const cursosAlunos = await global.banco.listarAlunosPorCurso();
+
+    const studentsLabels = cursosAlunos.map(c => c.curso);
+    const studentsDatasets = [{
+      label: 'Alunos',
+      data: cursosAlunos.map(c => c.alunos),
+      borderColor: '#8B5CF6',
+      backgroundColor: 'rgba(139, 92, 246, 0.1)',
+      fill: true,
+      tension: 0.4
+    }];
+
+    res.render('admin/dashboard', {
+      title: 'Dashboard Administrativo - EduStream',
+      admin: { name: global.adminEmail },
+      user: global.adminEmail,
+      totalCursos,
+      totalAlunos,
+      receitaTotal,
+      comparativo: { cursos: 25, alunos: 30, receita: 12 },
+      studentsLabels: JSON.stringify(studentsLabels),
+      studentsDatasets: JSON.stringify(studentsDatasets)
+    });
+
+  } catch (error) {
+    console.error('Erro ao carregar dashboard:', error);
+    res.render('admin/dashboard', {
+      title: 'Dashboard Administrativo - EduStream',
+      admin: { name: global.adminEmail },
+      user: global.adminEmail,
+      totalCursos: 0,
+      totalAlunos: 0,
+      receitaTotal: 'R$ 0,00',
+      comparativo: { cursos: 0, alunos: 0, receita: 0 },
+      studentsLabels: '[]',
+      studentsDatasets: '[]'
+    });
+  }
+});
+
+*/
 router.get('/dashboard', verLogin, async (req, res) => {
   try {
     const conn = await global.banco.conectarBD();
@@ -44,8 +99,32 @@ router.get('/dashboard', verLogin, async (req, res) => {
     const [alunos] = await conn.query("SELECT COUNT(*) AS total FROM usuarios");
     const totalAlunos = alunos[0].total;
 
-    // Receita mensal - removida porque não há tabela pagamentos
-    const receitaMensal = 0;
+    // Receita total
+    const [receita] = await conn.query("SELECT SUM(total) as total FROM receita_curso");
+    const receitaTotal = receita[0].total || 0;
+
+    // Alunos por curso
+    const cursosAlunos = await global.banco.listarAlunosPorCurso();
+    const labelsAlunos = cursosAlunos.map(c => c.curso);
+    const dataAlunos = cursosAlunos.map(c => c.alunos);
+
+    // Cursos mais vendidos pela receita
+    const [receitaCursos] = await conn.query(`
+      SELECT c.curnome AS curso, SUM(rc.total) AS receita
+      FROM receita_curso rc
+      JOIN cursos c ON c.curcodigo = rc.curcodigo
+      GROUP BY c.curcodigo
+      ORDER BY receita DESC
+    `);
+    const labelsReceita = receitaCursos.map(r => r.curso);
+    const dataReceita = receitaCursos.map(r => parseFloat(r.receita));
+
+    // Busca feedbacks
+    const [feedbacks] = await conn.query(`
+      SELECT id, tipo, mensagem
+      FROM feedback
+      ORDER BY tipo, id
+    `);
 
     res.render('admin/dashboard', {
       title: 'Dashboard Administrativo - EduStream',
@@ -53,12 +132,13 @@ router.get('/dashboard', verLogin, async (req, res) => {
       user: global.adminEmail,
       totalCursos,
       totalAlunos,
-      receitaMensal,
-      comparativo: {
-        cursos: 25,
-        alunos: 30,
-        receita: 0 // ajustar conforme necessidade
-      }
+      receitaTotal: receitaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      comparativo: { cursos: 25, alunos: 30, receita: 12 },
+      labelsAlunos: JSON.stringify(labelsAlunos),
+      dataAlunos: JSON.stringify(dataAlunos),
+      labelsReceita: JSON.stringify(labelsReceita),
+      dataReceita: JSON.stringify(dataReceita),
+      feedbacks // manda array direto para iterar no EJS
     });
 
   } catch (error) {
@@ -69,26 +149,62 @@ router.get('/dashboard', verLogin, async (req, res) => {
       user: global.adminEmail,
       totalCursos: 0,
       totalAlunos: 0,
-      receitaMensal: 0,
-      comparativo: {
-        cursos: 0,
-        alunos: 0,
-        receita: 0
-      },
-      erro: 'Erro ao carregar dados do dashboard'
+      receitaTotal: 'R$ 0,00',
+      comparativo: { cursos: 0, alunos: 0, receita: 0 },
+      labelsAlunos: '[]',
+      dataAlunos: '[]',
+      labelsReceita: '[]',
+      dataReceita: '[]',
+      feedbacks: []
     });
   }
 });
 
-// Gerenciamento de cursos
-router.get('/gerenciamento_curso', verLogin, (req, res) => {
-  res.render('admin/gerenciamento_curso', {
-    admNome: global.adminEmail
-  });
+
+router.get('/gerenciamento_curso', verLogin, async (req, res) => {
+  try {
+    const receitas = await global.banco.listarReceitaMensal();
+    const labelsLinha = receitas.map(r => r.curso);
+    const dataLinha = receitas.map(r => parseFloat(r.total));
+
+    const cursos = await global.banco.listarCursos();
+    const labelsPizza = cursos.map(c => c.titulo);
+    const dataPizza = cursos.map(c => c.alunos);
+
+    res.render('admin/gerenciamento_curso', {
+      title: 'Gerenciamento de cursos - EduStream',
+      admNome: global.adminEmail,
+      cursos,
+      labelsPizza: JSON.stringify(labelsPizza),
+      dataPizza: JSON.stringify(dataPizza),
+      labelsLinha: JSON.stringify(labelsLinha),
+      dataLinha: JSON.stringify(dataLinha)
+    });
+
+  } catch (error) {
+    console.error('Erro ao carregar cursos:', error);
+    res.render('admin/gerenciamento_curso', {
+      title: 'Gerenciamento de cursos - EduStream',
+      admNome: global.adminEmail,
+      cursos: [],
+      labelsPizza: '[]',
+      dataPizza: '[]',
+      labelsLinha: '[]',
+      dataLinha: '[]'
+    });
+  }
 });
+
+
  
 // Gerenciamento de usuários
 router.get('/gerenciamento_usuario', verLogin, async (req, res) => {
+  const conn = await global.banco.conectarBD();
+
+  // busca só o admin logado
+  const [adminData] = await conn.query("SELECT admfoto FROM admins WHERE admemail = ?", [global.adminEmail]);
+  const admin = adminData[0];
+
   try {
     const usuarios = await global.banco.listarUsuarios();
     res.render('admin/gerenciamento_usuario', {
@@ -96,7 +212,8 @@ router.get('/gerenciamento_usuario', verLogin, async (req, res) => {
       admNome: global.adminEmail,
       user: { name: global.adminEmail },
       users: usuarios,
-      totalUsers: usuarios.length
+      totalUsers: usuarios.length,
+      admin
     });
   } catch (error) {
     console.error('Erro ao carregar usuários:', error);
@@ -106,10 +223,12 @@ router.get('/gerenciamento_usuario', verLogin, async (req, res) => {
       user: { name: global.adminEmail },
       users: [],
       totalUsers: 0,
-      erro: 'Erro ao carregar usuários'
+      erro: 'Erro ao carregar usuários',
+      admin
     });
   }
 });
+
  
 // Novo curso - formulário
 router.get('/cursos_novo', verLogin, (req, res) => {

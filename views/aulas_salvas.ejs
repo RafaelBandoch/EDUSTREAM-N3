@@ -32,7 +32,7 @@
         <nav class="main-nav">
             <ul class="nav-list">
                 <li class="nav-item"><a href="/menu">Home</a></li>
-                <li class="nav-item active"><a href="/aulas_salvas">Aulas Salvas</a></li>
+                <li class="nav-item active"><a href="/aulas_salvas/<%= usuarioCodigo %>">Aulas Salvas</a></li>
                 <li class="nav-item"><a href="/meus_cursos">Meus Cursos</a></li>
             </ul>
         </nav>
@@ -51,9 +51,9 @@
                     <a href="/aula/<%= aula.aulaid %>" class="lesson-link" style="text-decoration: none;">
 
                         <div class="lesson-card">
-                            <div class="lesson-thumbnail">
+                            <div class="lesson-thumbnail" style="background-image: url('/uploads/<%= aula.thumb_url %>');">
                                 <div class="play-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
                                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
                                 </div>

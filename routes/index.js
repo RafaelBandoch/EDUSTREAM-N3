@@ -49,14 +49,13 @@ router.get('/menu', async (req, res) => {
     const [cursos] = await db.query('SELECT * FROM cursos');
     const [categorias] = await db.query('SELECT * FROM categorias');
     const [filtros] = await db.query('SELECT * FROM filtros ORDER BY filtnome');
-
     res.render('menu', {
       usuarioCodigo: global.usuarioCodigo,
       usuarioEmail: global.usuarioEmail,
       title: 'Menu - EduStream',
       cursos: cursos,
       categorias: categorias,
-      filtros: filtros
+      filtros: filtros,
     });
 
   } catch (err) {
@@ -145,6 +144,7 @@ router.get('/aulas_salvas/:usucodigo', async (req, res) => {
       SELECT 
         a.aulaid,
         a.titulo,
+        a.thumb_url,
         COALESCE(p.status, 'nao iniciado') AS status
       FROM aula a
       JOIN progresso p ON a.aulaid = p.id_aula

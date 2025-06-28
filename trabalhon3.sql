@@ -26,6 +26,7 @@ CREATE TABLE `admins` (
   `admcodigo` int(11) NOT NULL AUTO_INCREMENT,
   `admemail` varchar(50) DEFAULT NULL,
   `admsenha` varchar(255) NOT NULL,
+  `admfoto` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`admcodigo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -36,7 +37,7 @@ CREATE TABLE `admins` (
 
 LOCK TABLES `admins` WRITE;
 /*!40000 ALTER TABLE `admins` DISABLE KEYS */;
-INSERT INTO `admins` VALUES (1,'fulano@gmail.com','123');
+INSERT INTO `admins` VALUES (1,'fulano@gmail.com','123','ai-generated.jpg');
 /*!40000 ALTER TABLE `admins` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -67,7 +68,7 @@ CREATE TABLE `aula` (
 
 LOCK TABLES `aula` WRITE;
 /*!40000 ALTER TABLE `aula` DISABLE KEYS */;
-INSERT INTO `aula` VALUES (1,'Banco de Dados MySQL','Fundamentos de MySQL: criacao de tabelas, consultas SQL e relacionamentos entre tabelas.','videoteste.mp4',2000,'/images/check_5610944.svg',1),(2,'Introducao ao Node.js','Aula introdutoria','videoteste.mp4',30,'thumb1.jpg',1),(3,'Express Basico','Configuracao do Express','videoteste.mp4',45,'thumb2.jpg',3),(4,'EJS e Templates','Uso do EJS para views','videoteste.mp4',40,'thumb3.jpg',5),(5,'MySQL com Node.js','Integracao com MySQL','videoteste.mp4',50,'thumb4.jpg',4),(6,'Rotas e Middlewares','Manipulando rotas','videoteste.mp4',35,'thumb5.jpg',3),(7,'Autenticacao','Login e sessoes','videoteste.mp4',60,'thumb6.jpg',2);
+INSERT INTO `aula` VALUES (1,'Banco de Dados MySQL','Fundamentos de MySQL: criacao de tabelas, consultas SQL e relacionamentos entre tabelas.','videoteste.mp4',2000,'node.png',1),(2,'Introducao ao Node.js','Aula introdutoria','videoteste.mp4',30,'node.png',1),(3,'Express Basico','Configuracao do Express','videoteste.mp4',45,'node.png',3),(4,'EJS e Templates','Uso do EJS para views','videoteste.mp4',40,'node.png',5),(5,'MySQL com Node.js','Integracao com MySQL','videoteste.mp4',50,'node.png',4),(6,'Rotas e Middlewares','Manipulando rotas','videoteste.mp4',35,'node.png',3),(7,'Autenticacao','Login e sessoes','videoteste.mp4',60,'node.png',2);
 /*!40000 ALTER TABLE `aula` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,6 +110,7 @@ CREATE TABLE `cursos` (
   `curhoras` int(11) DEFAULT NULL,
   `curpreco` decimal(10,2) DEFAULT NULL,
   `catcodigo` int(11) DEFAULT NULL,
+  `curthumb` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`curcodigo`),
   KEY `fk_cursos_categorias` (`catcodigo`),
   CONSTRAINT `fk_cursos_categorias` FOREIGN KEY (`catcodigo`) REFERENCES `categorias` (`catcodigo`)
@@ -121,7 +123,7 @@ CREATE TABLE `cursos` (
 
 LOCK TABLES `cursos` WRITE;
 /*!40000 ALTER TABLE `cursos` DISABLE KEYS */;
-INSERT INTO `cursos` VALUES (1,'JavaScript Basico','Curso introdutorio de JavaScript',40,199.90,2),(2,'React Avancado','Curso avancado de React',60,299.90,2),(3,'Node.js Completo','Curso completo de Node.js',80,399.90,2),(4,'Design UI/UX','Curso de Design de Interface',50,249.90,1),(5,'Python do zero ao pro','Curso completo de Python',70,350.00,2),(6,'CSS e HTML Basico','Fundamentos de desenvolvimento web',30,150.00,2);
+INSERT INTO `cursos` VALUES (1,'JavaScript Basico','Curso introdutorio de JavaScript',40,199.90,2,'programacao.jpg'),(2,'React Avancado','Curso avancado de React',60,299.90,2,'node.png'),(3,'Node.js Completo','Curso completo de Node.js',80,399.90,2,'software.png'),(4,'Design UI/UX','Curso de Design de Interface',50,249.90,1,'node.png'),(5,'Python do zero ao pro','Curso completo de Python',70,350.00,2,'fundo_programacao.png'),(6,'CSS e HTML Basico','Fundamentos de desenvolvimento web',30,150.00,2,'node.png');
 /*!40000 ALTER TABLE `cursos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,18 +135,11 @@ DROP TABLE IF EXISTS `feedback`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `feedback` (
-  `id_feedback` int(11) NOT NULL AUTO_INCREMENT,
-  `usucodigo` int(11) DEFAULT NULL,
-  `aulaid` int(11) DEFAULT NULL,
-  `nota` int(11) DEFAULT NULL CHECK (`nota` between 1 and 5),
-  `comentario` text DEFAULT NULL,
-  `data_envio` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_feedback`),
-  KEY `usucodigo` (`usucodigo`),
-  KEY `aulaid` (`aulaid`),
-  CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`usucodigo`) REFERENCES `usuarios` (`usucodigo`),
-  CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`aulaid`) REFERENCES `aula` (`aulaid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo` enum('positive','negative') NOT NULL,
+  `mensagem` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -153,6 +148,7 @@ CREATE TABLE `feedback` (
 
 LOCK TABLES `feedback` WRITE;
 /*!40000 ALTER TABLE `feedback` DISABLE KEYS */;
+INSERT INTO `feedback` VALUES (1,'positive','Aulas bem explicadas e diretas'),(2,'positive','Professor atencioso e responde rapido'),(3,'negative','Poucos exemplos praticos no curso'),(4,'negative','Audio poderia ser mais claro');
 /*!40000 ALTER TABLE `feedback` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -212,27 +208,28 @@ INSERT INTO `progresso` VALUES (1,33,1,'em andamento',15),(2,33,1,'concluido',30
 UNLOCK TABLES;
 
 --
--- Table structure for table `tokens_invalidados`
+-- Table structure for table `receita_curso`
 --
 
-DROP TABLE IF EXISTS `tokens_invalidados`;
+DROP TABLE IF EXISTS `receita_curso`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tokens_invalidados` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `token` text NOT NULL,
-  `data_invalidacao` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+CREATE TABLE `receita_curso` (
+  `curcodigo` int(11) NOT NULL,
+  `total` decimal(10,2) DEFAULT 0.00,
+  PRIMARY KEY (`curcodigo`),
+  CONSTRAINT `receita_curso_ibfk_1` FOREIGN KEY (`curcodigo`) REFERENCES `cursos` (`curcodigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tokens_invalidados`
+-- Dumping data for table `receita_curso`
 --
 
-LOCK TABLES `tokens_invalidados` WRITE;
-/*!40000 ALTER TABLE `tokens_invalidados` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tokens_invalidados` ENABLE KEYS */;
+LOCK TABLES `receita_curso` WRITE;
+/*!40000 ALTER TABLE `receita_curso` DISABLE KEYS */;
+INSERT INTO `receita_curso` VALUES (1,399.80),(2,899.70),(3,799.80),(4,499.80),(5,700.00),(6,300.00);
+/*!40000 ALTER TABLE `receita_curso` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -261,6 +258,22 @@ LOCK TABLES `usuario_curso` WRITE;
 INSERT INTO `usuario_curso` VALUES (2,1),(2,3),(2,5),(3,2),(3,4),(25,1),(25,2),(25,3),(25,6),(33,2),(33,4),(33,5),(33,6);
 /*!40000 ALTER TABLE `usuario_curso` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 trigger trg_bloquear_matricula_repetida before insert on usuario_curso for each row if exists (select 1 from usuario_curso where usucodigo = new.usucodigo and curcodigo = new.curcodigo) then signal sqlstate '45000' set message_text = 'usuario ja matriculado neste curso';  
+end if */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `usuarios`
@@ -285,7 +298,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (2,'joao@gmail.com','123',NULL,NULL),(3,'teste@gmail.com','123',NULL,NULL),(25,'rafael@gmail.com','123',NULL,NULL),(33,'fulano@gmail.com','123',NULL,NULL),(41,'email@email.com','123','1750642890055-944071679.png','nome'),(42,'jao@gmail.com','123','1750642961918-164250240.png','meu nome');
+INSERT INTO `usuarios` VALUES (2,'joao@gmail.com','123','ai-generated.jpg',NULL),(3,'teste@gmail.com','123','ai-generated.jpg',NULL),(25,'rafael@gmail.com','123','ai-generated.jpg',NULL),(33,'fulano@gmail.com','123','ai-generated.jpg',NULL),(41,'email@email.com','123','ai-generated.jpg','nome'),(42,'jao@gmail.com','123','ai-generated.jpg','meu nome');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -362,4 +375,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-27 17:47:27
+-- Dump completed on 2025-06-28 17:39:33

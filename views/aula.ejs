@@ -82,11 +82,12 @@
  
       <!-- Avaliação e comentário -->
       <div class="mb-6">
-        <div class="flex space-x-1 text-yellow-400 text-xl mb-2">
-          <% for (let i=0; i < 5; i++) { %>
-            <span>☆</span>
+        <div id="rating" class="flex space-x-1 text-yellow-400 text-xl mb-2" style="cursor: pointer;">
+            <% for (let i = 0; i < 5; i++) { %>
+                <span data-index="<%= i %>">☆</span>
             <% } %>
         </div>
+
         <textarea placeholder="Deixe seu comentário sobre a aula"
           class="w-full p-3 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
         <button class="mt-2 bg-purple-600 text-white px-4 py-2 rounded text-sm hover:bg-purple-700 transition">
@@ -118,5 +119,16 @@
     </aside>
   </main>
 </body>
- 
+ <script>
+    const stars = document.querySelectorAll('#rating span');
+
+    stars.forEach((star, index) => {
+        star.addEventListener('click', () => {
+            stars.forEach((s, i) => {
+                s.textContent = i <= index ? '★' : '☆';
+            });
+        });
+    });
+</script>
+
 </html>
