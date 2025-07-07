@@ -1,6 +1,6 @@
-#Trabalho N3 - Edustream
+# Trabalho N3 - Edustream
 
-##Integrantes
-João Pedro Alves de Lima
-João Vitor Paranhos
+## Integrantes
+João Pedro Alves de Lima  
+João Vitor Paranhos  
 Rafael Alexandre Alves Bandoch
