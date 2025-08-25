@@ -30,6 +30,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=EDUSTREAM
+            -Dsonar.projectKey=EDUSTREAM-N3
             -Dsonar.organization=rafaelbandoch
             -Dsonar.sources=.
