@@ -9,21 +9,13 @@ on:
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
-
     steps:
-      # Pega o código do repositório
       - uses: actions/checkout@v3
-
-      # Configura Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-
-      # Instala dependências
       - run: npm install
-
-      # Roda a análise do SonarCloud
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
@@ -33,3 +25,5 @@ jobs:
             -Dsonar.projectKey=EDUSTREAM-N3
             -Dsonar.organization=rafaelbandoch
             -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.branch.name=main
