@@ -23,7 +23,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=EDUSTREAM-N3
-            -Dsonar.organization=rafaelbandoch
+            -Dsonar.organization=RafaelBandoch
             -Dsonar.sources=.
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.branch.name=main
