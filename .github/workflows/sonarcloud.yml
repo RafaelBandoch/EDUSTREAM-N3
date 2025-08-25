@@ -1,0 +1,35 @@
+name: SonarCloud Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Pega o código do repositório
+      - uses: actions/checkout@v3
+
+      # Configura Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Instala dependências
+      - run: npm install
+
+      # Roda a análise do SonarCloud
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=EDUSTREAM
+            -Dsonar.organization=rafaelbandoch
+            -Dsonar.sources=.
