@@ -30,5 +30,7 @@ jobs:
           args: >
             -Dsonar.organization=rafaelbandoch
             -Dsonar.projectKey=edustream-n3
+            -Dsonar.branch.name=main
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
