@@ -44,18 +44,20 @@ router.get('/', function(req, res, next) {
 });
 
 // GET Menu
+// GET Menu
 router.get('/menu', async (req, res) => {
   try {
-    const [cursos] = await db.query('SELECT * FROM cursos');
-    const [categorias] = await db.query('SELECT * FROM categorias');
-    const [filtros] = await db.query('SELECT * FROM filtros ORDER BY filtnome');
+    const cursos = await db.query('SELECT * FROM cursos');
+    const categorias = await db.query('SELECT * FROM categorias');
+    const filtros = await db.query('SELECT * FROM filtros ORDER BY filtnome');
+
     res.render('menu', {
       usuarioCodigo: global.usuarioCodigo,
       usuarioEmail: global.usuarioEmail,
       title: 'Menu - EduStream',
-      cursos: cursos,
-      categorias: categorias,
-      filtros: filtros,
+      cursos: Array.isArray(cursos) ? cursos : [],
+      categorias: Array.isArray(categorias) ? categorias : [],
+      filtros: Array.isArray(filtros) ? filtros : [],
     });
 
   } catch (err) {
@@ -63,6 +65,7 @@ router.get('/menu', async (req, res) => {
     res.status(500).send('Erro ao carregar dados.');
   }
 });
+
 
 
 // GET cadastro
@@ -94,13 +97,17 @@ router.get('/meus_cursos', async function (req, res) {
   console.log(cursos);
   res.render('meus_cursos', { cursos });
 });
-
-//GET Aulas
+// GET Aulas
 router.get('/aula/:id', async function (req, res) {
   verificarLogin(res);
 
   const usuario = String(global.usuarioCodigo);
-  const id = parseInt(req.params.id); // garante número
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id)) {
+    console.error('ID da aula inválido:', req.params.id);
+    return res.redirect('/menu'); // redireciona se não for número
+  }
 
   console.log('Id do usuario: ', usuario);
   console.log('Id da aula: ', id);
@@ -112,13 +119,10 @@ router.get('/aula/:id', async function (req, res) {
   }
 
   const curso = await global.banco.buscaCursoAulaId(aula.curcodigo);
-  const aulas = await global.banco.buscaAulaCursoId(aula.curcodigo);
+  let aulas = await global.banco.buscaAulaCursoId(aula.curcodigo);
 
-  console.log('Lista de aulas: ', aulas);
-  console.log('Infos da aula: ', aula);
-  console.log('Curso da aula: ', curso);
+  if (!Array.isArray(aulas)) aulas = [];
 
-  // Aqui renderiza tudo, incluindo a URL do vídeo
   res.render('aula', {
     aula,
     curso,
@@ -126,6 +130,7 @@ router.get('/aula/:id', async function (req, res) {
     titulo: `EduStream - ${aula.titulo}`
   });
 });
+
 
 
 // GET Aulas Salvas
@@ -140,17 +145,18 @@ router.get('/aulas_salvas/:usucodigo', async (req, res) => {
   }
 
   try {
-    const [aulas] = await db.query(`
-      SELECT 
-        a.aulaid,
-        a.titulo,
-        a.thumb_url,
-        COALESCE(p.status, 'nao iniciado') AS status
-      FROM aula a
-      JOIN progresso p ON a.aulaid = p.id_aula
-      WHERE p.id_usuario = ?
-      ORDER BY a.aulaid;
-    `, [usucodigo]);
+    const aulas = await db.query(`
+  SELECT 
+    a.aulaid,
+    a.titulo,
+    a.thumb_url,
+    COALESCE(p.status, 'nao iniciado') AS status
+  FROM aula a
+  JOIN progresso p ON a.aulaid = p.id_aula
+  WHERE p.id_usuario = ?
+  ORDER BY a.aulaid;
+`, [usucodigo]);
+
 
     res.render('aulas_salvas', { aulas, usuarioCodigo: usucodigo });
 

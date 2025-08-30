@@ -3,7 +3,14 @@ var express = require("express");
 const multer = require("multer");
 var path = require("path");
 var cookieParser = require("cookie-parser");
-const logger = require("./utils/logger"); // <<-- nosso logger
+const { logger } = require("./utils/logger");
+
+
+// Redireciona console para Winston/BetterStack
+console.log = (...args) => logger.info(args.join(" "));
+console.error = (...args) => logger.error(args.join(" "));
+console.warn = (...args) => logger.warn(args.join(" "));
+
 
 var indexRouter = require("./routes/index");
 var adminsRouter = require("./routes/admin");
@@ -69,15 +76,6 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-// Rota para forçar erro
-app.get("/forcar-erro", (req, res, next) => {
-  try {
-    // algo que vai dar erro
-    throw new Error("Erro proposital para teste de log 🚨");
-  } catch (err) {
-    next(err); // envia para o middleware de erro
-  }
-});
 
 logger.info("EduStream iniciado com sucesso!");
 
