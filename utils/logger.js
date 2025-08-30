@@ -1,21 +1,19 @@
-// utils/logger.js
-const { createLogger, format, transports } = require("winston");
+require('dotenv').config();
+const winston = require('winston');
+const { Logtail } = require("@logtail/node");
+const { LogtailTransport } = require("@logtail/winston");
 
-const logger = createLogger({
-  level: "info",
-  format: format.combine(
-    format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    format.errors({ stack: true }),
-    format.splat(),
-    format.json()
-  ),
-  defaultMeta: { service: "edustream-app" },
-  transports: [
-    new transports.Console(),
-    new transports.File({ filename: "logs/error.log", level: "error" }),
-    new transports.File({ filename: "logs/combined.log" })
-  ],
+const logtail = new Logtail(process.env.BETTERSTACK_SOURCE_TOKEN, {
+  endpoint: `https://${process.env.BETTERSTACK_INGESTION_HOST}`,
 });
 
+const logger = winston.createLogger({
+  level: "info",
+  transports: [
+    new winston.transports.Console(),
+    new LogtailTransport(logtail)
+  ]
+});
 
-module.exports = logger;
+// Exporta tanto o logger quanto o logtail para flush
+module.exports = { logger, logtail };
