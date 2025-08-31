@@ -54,3 +54,4 @@ jobs:
             -H "Authorization: Bearer ${BETTERSTACK_SOURCE_TOKEN}" \
             -H "Content-Type: application/json" \
             --data-binary @/tmp/log.json
+#oi
