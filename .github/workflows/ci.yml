@@ -1,0 +1,51 @@
+name: CI — SonarCloud + FOSSA + BetterStack
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test --if-present
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5.3.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: FOSSA Scan
+        uses: fossas/fossa-action@v1.7.0
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
+
+      - name: Send test log to BetterStack
+        if: ${{ always() }}
+        env:
+          BETTERSTACK_SOURCE_TOKEN: ${{ secrets.BETTERSTACK_SOURCE_TOKEN }}
+          BETTERSTACK_INGESTION_HOST: ${{ secrets.BETTERSTACK_INGESTION_HOST }}
+        run: |
+          ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "{\"dt\":\"$ts\",\"level\":\"info\",\"message\":\"CI run for $GITHUB_SHA\"}" > /tmp/log.json
+          curl -sS -X POST "https://${BETTERSTACK_INGESTION_HOST}/" \
+            -H "Authorization: Bearer ${BETTERSTACK_SOURCE_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data-binary @/tmp/log.json
